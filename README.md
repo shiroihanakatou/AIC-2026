@@ -3,31 +3,38 @@ Sản phẩm vòng sơ tuyển AI Challenge 2026
 
 Chạy Python 3.11
 
-Lấy dự án về máy:
+Cách lấy dự án về máy:
+
 Chạy các đoạn code dưới trong terminal, đứng tại thư mục dự án
+
 Bước 1: Clone repo về máy
 ```
 git clone https://github.com/shiroihanakatou/AIC-2026.git
 cd AIC-2026
 ```
+
 Bước 2: Tạo môi trường ảo bằng conda
     Cách 1: Dùng môi trường có sẵn
 ```
 conda env create -f configs/environment.yml
 conda activate aic-2026
 ```
+
     Cách 2: Tự tạo môi trường
 ```
 conda create -n ten-moi-truong python=3.11 -y
 conda activate ten-moi-truong
 pip install -r configs/requirements.txt
 ```
+
 Bước 3: Kiểm tra tính tương thích
+
     Cấp độ 1:
 ```
 pip check
 conda doctor
 ```
+
     Cấp độ 2:
 ```
 python -c "
@@ -54,6 +61,7 @@ print('OpenCLIP Version:', open_clip.__version__)
 print('===================================')
 "
 ```
+
     Cấp độ 3:
 Mở một file để dán đoạn này và chạy thử (chạy trong môi trường ảo)
 ```
