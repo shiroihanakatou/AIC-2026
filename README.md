@@ -28,7 +28,7 @@ pip install -r configs/requirements.txt
 
 Bước 3: Kiểm tra tính tương thích
 
-ấp độ 1:
+Cấp độ 1:
 ```
 pip check
 conda doctor
@@ -63,7 +63,6 @@ print('===================================')
 
 Cấp độ 3: Mở một file để dán đoạn này và chạy thử (chạy trong môi trường ảo)
 ```
-python -c "
 import torch
 import open_clip
 import faiss
@@ -100,5 +99,4 @@ index = faiss.IndexFlatIP(dimension)
 index.add(vector_np)
 
 print(f"-> Hoàn tất! FAISS đã lưu {index.ntotal} vector. Môi trường hoạt động 100% hoàn hảo!")
-"
 ```
