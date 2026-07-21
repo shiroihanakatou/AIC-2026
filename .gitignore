@@ -5,14 +5,5 @@ __pycache__/
 .vscode/
 
 # Bỏ qua kho dữ liệu thô và Vector Index nặng
-data/
-raw_videos/
-extracted_frames/
-*.index
-*.faiss
-*.pkl
-
-# Bỏ qua file checkpoint của mô hình AI nặng
-checkpoints/
-models/*.pt
-models/*.bin
+data/**
+!data/**/.gitkeep
