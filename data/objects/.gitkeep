@@ -1,0 +1,10 @@
+Định dạng: gồm nhiều file `<video_id>.json`.
+Liên kết: Kết nối 1-1 với từng video thông qua video_id.
+Định dạng từng file:
+- video_id.
+- total_keyframes: số lượng keyframes.
+- keyframes: chứa id các keyframe:
+    - keyframe_id: chứa các object trong từng keyframe, mỗi object có cấu trúc sau:
+        + label: tên object.
+        + score: mức độ chắc chắn của mô hình trong việc nhận diện object.
+        + box: [y_min, x_min, y_max, x_max]

@@ -1,0 +1,3 @@
+Định dạng: gồm các file ảnh `.png`.
+Liên kết: kết nối N-1 với videos, mỗi video_id ứng với nhiều keyframe.
+Cấu trúc keyframes: cây phân cấp `keyframes/<video_id>/<keyframe_id>.png`.

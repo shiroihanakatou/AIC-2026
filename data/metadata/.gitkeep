@@ -1,0 +1,10 @@
+Định dạng: gồm nhiều file `<video_id>.json`.
+Liên kết: kết nối 1-1 với file trong videos thông qua video_id.
+Cấu trúc từng file:
+- video_id.
+- title: tiêu đề video.
+- description: nội dung chi tiết.
+- author: tác giả/kênh đăng tải.
+- length: thời lượng video tính bằng giây.
+- publish_date: ngày đăng tải.
+- watch_url: đường dẫn video youtube.

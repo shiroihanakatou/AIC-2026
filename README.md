@@ -1,41 +1,74 @@
 # AIC-2026
-Sản phẩm vòng sơ tuyển AI Challenge 2026
 
-Chạy Python 3.11
+Sản phẩm vòng sơ tuyển AI Challenge 2026.
 
-Cách lấy dự án về máy: Chạy các đoạn code dưới trong terminal, đứng tại thư mục dự án
+Project này chạy trên Python 3.11.
 
-Bước 1: Clone repo về máy
-```
+## Cấu trúc thư mục
+
+### Nhóm `sources/`
+
+| Thư mục | Mô tả |
+| --- | --- |
+| `sources/agent/` | Sub-system dành cho Trợ lý AI (LLM Planner, Query Expansion, Conversational Agent phục vụ KISC/VideoQA). |
+| `sources/database/` | Quản lý kết nối, lưu trữ và truy vấn Vector Database cũng như Metadata Database. |
+| `sources/ingestion/` | Chứa các script đọc, làm sạch và chuẩn hóa dữ liệu từ `data/` (keyframes, clipfeatures, metadata, objects). |
+| `sources/retrieval/` | Lõi thuật toán tìm kiếm (Search engine, Cosine similarity, Fusion logic, Re-ranking). |
+| `sources/services/` | Dựng các endpoint API phục vụ dữ liệu cho UI. |
+| `sources/uxui/` | Mã nguồn giao diện người dùng (Streamlit / Gradio / React). |
+
+### Nhóm `data/`
+
+| Thư mục | Mô tả |
+| --- | --- |
+| `data/videos/` | Lưu trữ video gốc của ban tổ chức, theo từng `video_id`. |
+| `data/keyframes/` | Chứa các keyframe đã tách từ video, tổ chức theo từng `video_id` và `keyframe_id`. |
+| `data/clipfeatures/` | Lưu các vector đặc trưng CLIP tương ứng với từng video và keyframe. |
+| `data/metadata/` | Lưu metadata mô tả video như tiêu đề, tác giả, thời lượng và liên kết xem. |
+| `data/objects/` | Lưu kết quả nhận diện object trên từng video và các keyframe liên quan. |
+
+Phần `data/` được rút gọn từ nội dung trong từng file `.gitkeep`, tập trung vào mô tả tổng quát vai trò của mỗi thư mục.
+
+## Hướng dẫn cài đặt
+
+Để lấy dự án về máy, hãy chạy các lệnh dưới đây trong terminal, đứng tại thư mục dự án.
+
+### Bước 1: Clone repository về máy
+
+```bash
 git clone https://github.com/shiroihanakatou/AIC-2026.git
 cd AIC-2026
 ```
 
-Bước 2: Tạo môi trường ảo bằng conda
+### Bước 2: Tạo môi trường ảo bằng conda
 
-Cách 1: Dùng môi trường có sẵn
-```
+#### Cách 1: Dùng môi trường có sẵn
+
+```bash
 conda env create -f configs/environment.yml
 conda activate aic-2026
 ```
 
-Cách 2: Tự tạo môi trường
-```
+#### Cách 2: Tự tạo môi trường
+
+```bash
 conda create -n ten-moi-truong python=3.11 -y
 conda activate ten-moi-truong
 pip install -r configs/requirements.txt
 ```
 
-Bước 3: Kiểm tra tính tương thích
+### Bước 3: Kiểm tra tính tương thích
 
-Cấp độ 1:
-```
+#### Cấp độ 1
+
+```bash
 pip check
 conda doctor
 ```
 
-Cấp độ 2:
-```
+#### Cấp độ 2
+
+```bash
 python -c "
 import torch
 import torchvision
@@ -61,8 +94,11 @@ print('===================================')
 "
 ```
 
-Cấp độ 3: Mở một file để dán đoạn này và chạy thử (chạy trong môi trường ảo)
-```
+#### Cấp độ 3
+
+Mở một file Python để dán đoạn code dưới đây và chạy thử trong môi trường ảo.
+
+```python
 import torch
 import open_clip
 import faiss
@@ -95,7 +131,7 @@ vector_np = image_features.cpu().numpy().astype(np.float32)
 print("5. Test nạp Vector vào FAISS Index...")
 dimension = vector_np.shape[1]
 # Tạo FAISS Index đơn giản
-index = faiss.IndexFlatIP(dimension) 
+index = faiss.IndexFlatIP(dimension)
 index.add(vector_np)
 
 print(f"-> Hoàn tất! FAISS đã lưu {index.ntotal} vector. Môi trường hoạt động 100% hoàn hảo!")
