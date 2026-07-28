@@ -1,1 +1,1 @@
-Chứa các script đọc, làm sạch và chuẩn hóa dữ liệu từ data/ (keyframes, clipfeatures, metadata, objects).
+Chứa các module và script dùng để tải, tiền xử lý và chuẩn hóa dữ liệu từ thư mục data/ (keyframes, clipfeatures, metadata, objects) cho quá trình ingestion.
