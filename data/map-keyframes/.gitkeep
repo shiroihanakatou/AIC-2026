@@ -1,0 +1,11 @@
+Định dạng:
+- Gồm các file CSV, mỗi file mang tên `<video_id>.csv`.
+
+Liên kết:
+- Mỗi file CSV liên kết 1-1 với một video thông qua `video_id`.
+- Các dòng trong CSV dùng để khớp keyframe ảnh ở `data/keyframes/<video_id>/`, vector đặc trưng ở `data/clip-features/<video_id>.npy` và thông tin object ở `data/objects/<video_id>/`.
+
+Cấu trúc từng file:
+- Mỗi dòng mô tả một keyframe với các cột chính: `n`, `pts_time`, `fps`, `frame_idx`.
+- `n` là số thứ tự keyframe, `pts_time` là thời điểm tính bằng giây, `fps` là tốc độ khung hình, `frame_idx` là chỉ số frame gốc.
+- Một số dòng có thể để trống `frame_idx` nếu không xác định được frame gốc tương ứng.

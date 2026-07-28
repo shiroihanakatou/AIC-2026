@@ -1,0 +1,11 @@
+Định dạng:
+- Gồm nhiều tệp ma trận NumPy `.npy`, mỗi tệp mang tên `<video_id>.npy`.
+
+Liên kết:
+- Mỗi file liên kết 1-1 với một video thông qua `video_id`.
+- Thứ tự các hàng trong ma trận khớp với thứ tự keyframe của video, nên có thể đối chiếu với `data/keyframes/<video_id>/`, `data/map-keyframes/<video_id>.csv` và `data/objects/<video_id>/`.
+
+Cấu trúc từng file:
+- Là một mảng NumPy 2 chiều có kích thước `(số_keyframe, kích_thước_vector)`.
+- Mỗi hàng là một vector đặc trưng CLIP của một keyframe.
+- Trong dữ liệu mẫu hiện tại, ma trận có dạng `float16` và kích thước vector là 512.
