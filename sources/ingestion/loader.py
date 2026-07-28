@@ -91,25 +91,34 @@ def load_all_data(
                 "fps": float(kf_info.get("fps", 0.0)),
                 "frame_idx": int(kf_info.get("frame_idx", 0)),
                 "image_path": kf_info.get("image_path"),
-                "relative_path": kf_info.get("relative_path"),
                 # Video Metadata (JSON)
-                "video_title": v_meta.get("title"),
                 "video_author": v_meta.get("author"),
                 "video_channel_id": v_meta.get("channel_id"),
                 "video_channel_url": v_meta.get("channel_url"),
-                "video_publish_date": v_meta.get("publish_date"),
-                "video_watch_url": v_meta.get("watch_url"),
+                "video_description": v_meta.get("description"),
+                "video_keywords": json.dumps(
+                    v_meta.get("keywords", []), ensure_ascii=False
+                ),
                 "video_length": v_meta.get("length"),
+                "video_publish_date": v_meta.get("publish_date"),
+                "video_title": v_meta.get("title"),
+                "video_watch_url": v_meta.get("watch_url"),
                 # Objects Detection (JSON String)
-                "detected_classes": json.dumps(
+                "detection_class_names": json.dumps(
                     obj_info.get("detection_class_names", []), ensure_ascii=False
                 ),
-                "detected_scores": json.dumps(
+                "detection_class_labels": json.dumps(
+                    obj_info.get("detection_class_labels", []), ensure_ascii=False
+                ),
+                "detection_scores": json.dumps(
                     obj_info.get("detection_scores", [])
                 ),
-                "detected_boxes": json.dumps(
+                "detection_boxes": json.dumps(
                     obj_info.get("detection_boxes", [])
                 ),
+                "detection_class_entities": json.dumps(
+                    obj_info.get("detection_class_entities", []), ensure_ascii=False
+                )
             }
 
             metadata_records.append(record)
