@@ -1,64 +1,87 @@
 import csv
 import os
+import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 
+# =====================================================================
+# Cấu hình Đường dẫn Tuyệt đối & System Path (Tránh lỗi Import)
+# =====================================================================
+CURRENT_FILE_PATH = Path(__file__).resolve()
+PROJECT_ROOT = CURRENT_FILE_PATH.parent.parent.parent
+
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+
 def get_project_root() -> Path:
-    """Xác định đường dẫn thư mục gốc của dự án (project/)."""
     return Path(__file__).resolve().parents[2]
 
 
+def _resolve_root_dir(base_dir: Optional[Union[str, Path]]) -> Path:
+    return Path(base_dir) if base_dir else get_project_root()
+
+
+def _normalize_video_ids(video_ids: Optional[Union[str, List[str]]], keyframes_base_dir: Path) -> List[str]:
+    if video_ids is None:
+        return [directory.name for directory in keyframes_base_dir.iterdir() if directory.is_dir()]
+    if isinstance(video_ids, str):
+        return [video_ids]
+    return list(video_ids)
+
+
+def _load_csv_map(csv_file_path: Path) -> Dict[str, Dict[str, Any]]:
+    if not csv_file_path.exists():
+        return {}
+
+    with open(csv_file_path, mode="r", encoding="utf-8") as file_handle:
+        reader = csv.DictReader(file_handle)
+        return {row["n"]: row for row in reader}
+
+
+def _build_keyframe_record(
+    video_id: str,
+    image_path: Path,
+    csv_map: Dict[str, Dict[str, Any]],
+    root_dir: Path,
+) -> Dict[str, Any]:
+    frame_id = image_path.stem
+    record: Dict[str, Any] = {
+        "video_id": video_id,
+        "frame_id": frame_id,
+        "image_path": str(image_path.resolve()),
+        "relative_path": str(image_path.relative_to(root_dir)),
+    }
+
+    csv_row = csv_map.get(str(int(frame_id)))
+    if csv_row:
+        record.update(csv_row)
+
+    return record
+
+
 def _process_single_video(
-    v_id: str,
+    video_id: str,
     keyframes_base_dir: Path,
     map_base_dir: Path,
-    root_dir: Path
+    root_dir: Path,
 ) -> Tuple[str, List[Dict[str, Any]]]:
-    """
-    Hàm phụ trợ: Đọc và gộp dữ liệu cho duy nhất 1 video_id.
-    Được thiết kế để chạy độc lập trên từng Thread.
-    """
-    video_keyframe_dir = keyframes_base_dir / v_id
-    csv_file_path = map_base_dir / f"{v_id}.csv"
+    video_keyframe_dir = keyframes_base_dir / video_id
+    csv_file_path = map_base_dir / f"{video_id}.csv"
 
     if not video_keyframe_dir.exists():
-        return v_id, []
+        return video_id, []
 
-    # 1. Đọc dữ liệu CSV
-    csv_map: Dict[str, Dict[str, Any]] = {}
-    if csv_file_path.exists():
-        with open(csv_file_path, mode="r", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            csv_map = {row["n"]: row for row in reader}
+    csv_map = _load_csv_map(csv_file_path)
+    image_files = sorted(video_keyframe_dir.glob("*.jpg"), key=lambda path: int(path.stem))
+    keyframes = [
+        _build_keyframe_record(video_id, image_path, csv_map, root_dir)
+        for image_path in image_files
+    ]
 
-    # 2. Đọc và sắp xếp danh sách file ảnh
-    image_files = sorted(
-        video_keyframe_dir.glob("*.jpg"),
-        key=lambda p: int(p.stem)
-    )
-
-    video_keyframes: List[Dict[str, Any]] = []
-
-    # 3. Merge thông tin
-    for img_path in image_files:
-        frame_id = img_path.stem
-        frame_n_key = str(int(frame_id))
-
-        item: Dict[str, Any] = {
-            "video_id": v_id,
-            "frame_id": frame_id,
-            "image_path": str(img_path.resolve()),
-            "relative_path": str(img_path.relative_to(root_dir)),
-        }
-
-        if frame_n_key in csv_map:
-            item.update(csv_map[frame_n_key])
-
-        video_keyframes.append(item)
-
-    return v_id, video_keyframes
+    return video_id, keyframes
 
 
 def load_keyframes_parallel(
@@ -66,48 +89,28 @@ def load_keyframes_parallel(
     base_dir: Optional[Union[str, Path]] = None,
     max_workers: Optional[int] = None,
 ) -> Dict[str, List[Dict[str, Any]]]:
-    """
-    Đọc dữ liệu keyframes và CSV song song sử dụng ThreadPoolExecutor.
-
-    Args:
-        video_ids: Danh sách các video_id cần load.
-        base_dir: Thư mục gốc project.
-        max_workers: Số luồng chạy song song (Mặc định: min(32, os.cpu_count() + 4)).
-    """
-    root_dir = Path(base_dir) if base_dir else get_project_root()
+    """Đọc dữ liệu keyframes và CSV song song bằng ThreadPoolExecutor."""
+    root_dir = _resolve_root_dir(base_dir)
     keyframes_base_dir = root_dir / "data" / "keyframes"
     map_base_dir = root_dir / "data" / "map-keyframes"
 
-    if video_ids is None:
-        target_video_ids = [
-            d.name for d in keyframes_base_dir.iterdir() if d.is_dir()
-        ]
-    elif isinstance(video_ids, str):
-        target_video_ids = [video_ids]
-    else:
-        target_video_ids = list(video_ids)
+    target_video_ids = _normalize_video_ids(video_ids, keyframes_base_dir)
+    if not target_video_ids:
+        return {}
 
+    worker_count = max_workers or min(32, (os.cpu_count() or 4) * 2)
     result: Dict[str, List[Dict[str, Any]]] = {}
 
-    # Nếu số lượng worker không truyền vào, mặc định tự động tính dựa theo số luồng I/O
-    if max_workers is None:
-        max_workers = min(32, (os.cpu_count() or 4) * 2)
-
-    # Khởi tạo ThreadPoolExecutor để quản lý các luồng đọc ghi
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        # Gửi tất cả các tác vụ xử lý từng video vào pool
-        future_to_vid = {
-            executor.submit(
-                _process_single_video, v_id, keyframes_base_dir, map_base_dir, root_dir
-            ): v_id
-            for v_id in target_video_ids
+    with ThreadPoolExecutor(max_workers=worker_count) as executor:
+        future_to_video_id = {
+            executor.submit(_process_single_video, video_id, keyframes_base_dir, map_base_dir, root_dir): video_id
+            for video_id in target_video_ids
         }
 
-        # Thu thập kết quả ngay khi một Thread hoàn tất (as_completed)
-        for future in as_completed(future_to_vid):
-            v_id, video_keyframes = future.result()
-            if video_keyframes:
-                result[v_id] = video_keyframes
+        for future in as_completed(future_to_video_id):
+            video_id, keyframes = future.result()
+            if keyframes:
+                result[video_id] = keyframes
 
     return result
 
@@ -117,5 +120,5 @@ if __name__ == "__main__":
     data = load_keyframes_parallel()
     print(f"Đã load thành công {len(data)} video.\n")
 
-    for v_id, keyframes in data.items():
-        print(f"- Video ID: {v_id} | Tổng số keyframes: {len(keyframes)}")
+    for video_id, keyframes in data.items():
+        print(f"- Video ID: {video_id} | Tổng số keyframes: {len(keyframes)}")
