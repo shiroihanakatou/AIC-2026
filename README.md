@@ -29,6 +29,33 @@ Project này chạy trên Python 3.11.
 
 Phần `data/` được rút gọn từ nội dung trong từng file `.gitkeep`, tập trung vào mô tả tổng quát vai trò của mỗi thư mục.
 
+```bash
+               ┌────────────────────────┐
+               │    data/metadata/      │  (Thông tin YouTube / Video gốc)
+               │   <video_id>.json      │
+               └───────────┬────────────┘
+                           │ 1 - 1
+                           ▼
+ ┌───────────────────────────────────────────────────┐
+ │                  data/videos/                     │  (Tệp video gốc MP4)
+ │                <video_id>.mp4                     │
+ └─────────────────────────┬─────────────────────────┘
+                           │ 1 - N (Một video chứa nhiều khung ảnh)
+                           ▼
+ ┌───────────────────────────────────────────────────┐
+ │                 data/keyframes/                   │  (Ảnh cắt ra từ video)
+ │        <video_id>/<frame_id>.jpg                  │
+ └───────────┬───────────────────────────┬───────────┘
+             │                           │
+             │ 1 - 1                     │ 1 - 1
+             ▼                           ▼
+┌─────────────────────────┐  ┌─────────────────────────┐
+│   data/clipfeatures/    │  │      data/objects/      │
+│  <video_id>.npy/.json   │  │   <video_id>.json       │
+│(Vector ngữ nghĩa 512D)  │  │ (Tọa độ & Nhãn vật thể) │
+└─────────────────────────┘  └─────────────────────────┘
+```
+
 ## Hướng dẫn cài đặt
 
 Để lấy dự án về máy, hãy chạy các lệnh dưới đây trong terminal, đứng tại thư mục dự án.
