@@ -21,39 +21,41 @@ Project này chạy trên Python 3.11.
 
 | Thư mục | Mô tả |
 | --- | --- |
-| `data/videos/` | Lưu trữ video gốc của ban tổ chức, theo từng `video_id`. |
-| `data/keyframes/` | Chứa các keyframe đã tách từ video, tổ chức theo từng `video_id` và `keyframe_id`. |
-| `data/clipfeatures/` | Lưu các vector đặc trưng CLIP tương ứng với từng video và keyframe. |
-| `data/metadata/` | Lưu metadata mô tả video như tiêu đề, tác giả, thời lượng và liên kết xem. |
-| `data/objects/` | Lưu kết quả nhận diện object trên từng video và các keyframe liên quan. |
+| `data/keyframes/` | Chứa ảnh keyframe của từng video, tổ chức theo cây thư mục `data/keyframes/<video_id>/<keyframe_id>.jpg`. |
+| `data/map-keyframes/` | Chứa các file CSV ánh xạ keyframe với thời gian và frame gốc, theo `data/map-keyframes/<video_id>.csv`. |
+| `data/clip-features/` | Chứa ma trận NumPy đặc trưng CLIP cho từng video, theo `data/clip-features/<video_id>.npy`. |
+| `data/metadata/` | Chứa metadata cấp video như tiêu đề, kênh đăng tải, thời lượng, ngày đăng và liên kết YouTube. |
+| `data/objects/` | Chứa kết quả phát hiện object theo từng keyframe, theo `data/objects/<video_id>/<keyframe_id>.json`. |
 
-Phần `data/` được rút gọn từ nội dung trong từng file `.gitkeep`, tập trung vào mô tả tổng quát vai trò của mỗi thư mục.
+Phần `data/` được rút gọn từ nội dung trong từng file `.gitkeep`, tập trung vào mô tả tổng quát vai trò của mỗi thư mục và quan hệ giữa keyframes, map-keyframes, clip-features, metadata và objects.
 
 ```bash
                ┌────────────────────────┐
                │    data/metadata/      │  (Thông tin YouTube / Video gốc)
                │   <video_id>.json      │
                └───────────┬────────────┘
-                           │ 1 - 1
+                           │ 1 - N
                            ▼
- ┌───────────────────────────────────────────────────┐
- │                  data/videos/                     │  (Tệp video gốc MP4)
- │                <video_id>.mp4                     │
- └─────────────────────────┬─────────────────────────┘
-                           │ 1 - N (Một video chứa nhiều khung ảnh)
-                           ▼
- ┌───────────────────────────────────────────────────┐
- │                 data/keyframes/                   │  (Ảnh cắt ra từ video)
- │        <video_id>/<frame_id>.jpg                  │
- └───────────┬───────────────────────────┬───────────┘
-             │                           │
-             │ 1 - 1                     │ 1 - 1
-             ▼                           ▼
-┌─────────────────────────┐  ┌─────────────────────────┐
-│   data/clipfeatures/    │  │      data/objects/      │
-│  <video_id>.npy/.json   │  │   <video_id>.json       │
-│(Vector ngữ nghĩa 512D)  │  │ (Tọa độ & Nhãn vật thể) │
-└─────────────────────────┘  └─────────────────────────┘
+┌───────────────────────────────────────────────────┐
+│                 data/keyframes/                   │  (Ảnh keyframe của từng video)
+│     <video_id>/<keyframe_id>.jpg                  │
+└───────────┬───────────────────────────┬───────────┘
+            │                           │
+            │ 1 - 1                     │ 1 - 1
+            ▼                           ▼
+┌─────────────────────────┐  ┌────────────────────────────┐
+│  data/clip-features/    │  │    data/objects/           │
+│     <video_id>.npy      │  │ <video_id>/<keyframe>.json │
+│ (Vector CLIP cho từng   │  │ (Nhãn, điểm tin cậy,       │
+│  keyframe)              │  │  hộp giới hạn)             │
+└─────────────────────────┘  └────────────────────────────┘
+            ▲
+            │ cùng thứ tự keyframe
+            │
+┌───────────────────────────────────────────────────┐
+│               data/map-keyframes/                 │  (Ánh xạ keyframe với frame gốc)
+│                <video_id>.csv                     │
+└───────────────────────────────────────────────────┘
 ```
 
 ## Hướng dẫn cài đặt

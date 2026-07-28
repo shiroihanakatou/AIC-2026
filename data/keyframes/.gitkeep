@@ -1,3 +1,10 @@
-Định dạng: gồm các file ảnh `.png`.
-Liên kết: kết nối N-1 với videos, mỗi video_id ứng với nhiều keyframe.
-Cấu trúc keyframes: cây phân cấp `keyframes/<video_id>/<keyframe_id>.png`.
+Định dạng:
+- Gồm các ảnh keyframe `.jpg` được tổ chức theo từng video.
+
+Liên kết:
+- Mỗi thư mục con tương ứng với một `video_id`.
+- Mỗi ảnh keyframe liên kết với các dòng trong `data/map-keyframes/<video_id>.csv`, đồng thời dùng chung thứ tự keyframe với `data/clip-features/<video_id>.npy` và `data/objects/<video_id>/`.
+
+Cấu trúc từng file:
+- Dạng cây thư mục `keyframes/<video_id>/<keyframe_id>.jpg`.
+- Mỗi file ảnh là một keyframe riêng lẻ, ví dụ `0001.jpg`, `0002.jpg`, ... theo thứ tự xuất hiện của keyframe trong video.

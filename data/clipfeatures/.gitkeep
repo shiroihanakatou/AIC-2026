@@ -1,3 +1,0 @@
-Định dạng: gồm nhiều tệp ma trận numpy `<video_id>.npy`.
-Liên kết: kết nối 1-1 với từng videos thông qua video_id.
-Cấu trúc từng file: gồm nhiều dòng, mỗi dòng ứng với một keyframe, mỗi dòng là một vector có D cột (512 hoặc 768 tùy ban tổ chức).

@@ -1,10 +1,10 @@
-Định dạng: gồm nhiều file `<video_id>.json`.
-Liên kết: kết nối 1-1 với file trong videos thông qua video_id.
+Định dạng:
+- Gồm nhiều file JSON, mỗi file mang tên `<video_id>.json`.
+
+Liên kết:
+- Mỗi file là metadata cấp video, liên kết 1-1 với một video thông qua `video_id` nằm trong tên file.
+- Nội dung metadata được dùng để diễn giải và truy vết các dữ liệu con như `keyframes`, `map-keyframes`, `clip-features` và `objects`.
+
 Cấu trúc từng file:
-- video_id.
-- title: tiêu đề video.
-- description: nội dung chi tiết.
-- author: tác giả/kênh đăng tải.
-- length: thời lượng video tính bằng giây.
-- publish_date: ngày đăng tải.
-- watch_url: đường dẫn video youtube.
+- Là một JSON object chứa các trường mô tả video: `author`, `channel_id`, `channel_url`, `description`, `keywords`, `length`, `publish_date`, `thumbnail_url`, `title`, `watch_url`.
+- `title` là tiêu đề video, `author` và `channel_*` mô tả kênh đăng tải, `length` là thời lượng tính bằng giây, `publish_date` là ngày đăng tải, `watch_url` là đường dẫn YouTube gốc.

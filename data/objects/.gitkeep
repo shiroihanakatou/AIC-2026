@@ -1,10 +1,11 @@
-Định dạng: gồm nhiều file `<video_id>.json`.
-Liên kết: Kết nối 1-1 với từng video thông qua video_id.
-Định dạng từng file:
-- video_id.
-- total_keyframes: số lượng keyframes.
-- keyframes: chứa id các keyframe:
-    - keyframe_id: chứa các object trong từng keyframe, mỗi object có cấu trúc sau:
-        + label: tên object.
-        + score: mức độ chắc chắn của mô hình trong việc nhận diện object.
-        + box: [y_min, x_min, y_max, x_max]
+Định dạng:
+- Gồm nhiều file JSON, mỗi file mang tên `<video_id>/<keyframe_id>.json`.
+
+Liên kết:
+- Mỗi file tương ứng với một keyframe cụ thể của một video.
+- Tên file JSON khớp với ảnh keyframe ở `data/keyframes/<video_id>/<keyframe_id>.jpg`, đồng thời thứ tự keyframe có thể đối chiếu với `data/map-keyframes/<video_id>.csv` và `data/clip-features/<video_id>.npy`.
+
+Cấu trúc từng file:
+- Là một JSON object chứa các mảng song song: `detection_class_names`, `detection_class_labels`, `detection_class_entities`, `detection_scores`, `detection_boxes`.
+- Mỗi vị trí trong các mảng tương ứng với một object được phát hiện trên keyframe đó.
+- `detection_boxes` lưu tọa độ hộp giới hạn theo dạng `[y_min, x_min, y_max, x_max]`; các mảng còn lại mô tả lớp, nhãn thực thể và độ tin cậy của object.
