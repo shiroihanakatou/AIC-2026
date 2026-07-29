@@ -3,6 +3,7 @@ import os
 import sqlite3
 import sys
 from pathlib import Path
+from contextlib import closing
 from typing import Any, Dict, List
 
 
@@ -127,7 +128,7 @@ class SQLiteDatabase:
         create_index_global_id = "CREATE INDEX IF NOT EXISTS idx_global_id ON keyframes(global_id);"
         create_index_video_id = "CREATE INDEX IF NOT EXISTS idx_video_id ON keyframes(video_id);"
 
-        with self.get_connection() as connection:
+        with closing(self.get_connection()) as connection:
             cursor = connection.cursor()
             cursor.execute(create_table_sql)
             cursor.execute(create_index_global_id)
@@ -146,27 +147,51 @@ class SQLiteDatabase:
         insert_sql = f"INSERT OR REPLACE INTO keyframes ({columns_str}) VALUES ({placeholders_str});"
         rows_to_insert = _records_to_rows(metadata_records, self.COLUMNS)
 
-        with self.get_connection() as connection:
-            cursor = connection.cursor()
-            cursor.executemany(insert_sql, rows_to_insert)
-            connection.commit()
-
-        print(f"💾 Đã chèn/cập nhật thành công {len(metadata_records)} bản ghi vào CSDL SQLite.")
+        try:
+            with closing(self.get_connection()) as connection:
+                cursor = connection.cursor()
+                cursor.executemany(insert_sql, rows_to_insert)
+                connection.commit()
+            print(f"💾 Đã chèn/cập nhật thành công {len(metadata_records)} bản ghi vào CSDL SQLite.")
+        except sqlite3.Error as e:
+            print(f"❌ LỖI SQLITE khi chèn dữ liệu: {e}")
+            print("💡 Gợi ý: Kiểm tra xem file database có đang bị ứng dụng khác khóa không, hoặc cấu trúc bảng có bị thay đổi không.")
 
     def get_records_by_global_ids(self, global_ids: List[str]) -> List[Dict[str, Any]]:
         if not global_ids:
             return []
 
-        placeholders = ", ".join(["?"] * len(global_ids))
-        query_sql = f"SELECT * FROM keyframes WHERE global_id IN ({placeholders});"
+        records_map = self._get_records_map_by_global_ids(global_ids)
+        return self._build_ordered_records(global_ids, records_map)
 
-        with self.get_connection() as connection:
+    def _get_records_map_by_global_ids(self, global_ids: List[str]) -> Dict[str, Dict[str, Any]]:
+        records_map: Dict[str, Dict[str, Any]] = {}
+        CHUNK_SIZE = 900  # Đảm bảo nằm trong giới hạn an toàn của SQLite
+
+        with closing(self.get_connection()) as connection:
             cursor = connection.cursor()
-            cursor.execute(query_sql, global_ids)
-            rows = cursor.fetchall()
 
-        records_map = _rows_to_records(rows)
-        return [records_map[global_id] for global_id in global_ids if global_id in records_map]
+            for chunk_ids in self._chunk_values(global_ids, CHUNK_SIZE):
+                rows = self._fetch_rows_by_global_ids(cursor, chunk_ids)
+                records_map.update(_rows_to_records(rows))
+
+        return records_map
+
+    def _chunk_values(self, values: List[str], chunk_size: int) -> List[List[str]]:
+        return [values[i:i + chunk_size] for i in range(0, len(values), chunk_size)]
+
+    def _fetch_rows_by_global_ids(self, cursor: sqlite3.Cursor, chunk_ids: List[str]) -> List[sqlite3.Row]:
+        placeholders = ", ".join(["?"] * len(chunk_ids))
+        query_sql = f"SELECT * FROM keyframes WHERE global_id IN ({placeholders});"
+        cursor.execute(query_sql, chunk_ids)
+        return cursor.fetchall()
+
+    def _build_ordered_records(
+        self,
+        global_ids: List[str],
+        records_map: Dict[str, Dict[str, Any]],
+    ) -> List[Dict[str, Any]]:
+        return [records_map[g_id] for g_id in global_ids if g_id in records_map]
 
 
 if __name__ == "__main__":

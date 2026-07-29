@@ -51,8 +51,7 @@ def _build_keyframe_record(
     record: Dict[str, Any] = {
         "video_id": video_id,
         "frame_id": frame_id,
-        "image_path": str(image_path.resolve()),
-        "relative_path": str(image_path.relative_to(root_dir)),
+        "image_path": str(image_path.relative_to(root_dir).as_posix())
     }
 
     csv_row = csv_map.get(str(int(frame_id)))

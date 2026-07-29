@@ -80,11 +80,14 @@ class VectorDatabase:
         os.makedirs(Path(index_path).parent, exist_ok=True)
         os.makedirs(Path(map_path).parent, exist_ok=True)
 
-        faiss.write_index(self.index, index_path)
-        _save_id_map(map_path, self.id_map)
-
-        print(f"💾 Đã lưu Index tại: {index_path}")
-        print(f"💾 Đã lưu ID Map tại: {map_path}")
+        try:
+            faiss.write_index(self.index, index_path)
+            _save_id_map(map_path, self.id_map)
+            print(f"💾 Đã lưu Index tại: {index_path}")
+            print(f"💾 Đã lưu ID Map tại: {map_path}")
+        except (IOError, OSError) as e:
+            print(f"❌ LỖI I/O khi lưu FAISS Index: {e}")
+            print("💡 Gợi ý: Kiểm tra xem ổ cứng còn trống không, hoặc bạn có quyền ghi vào thư mục này không.")
 
     def load_index(self, index_path: str, map_path: str) -> None:
         if not os.path.exists(index_path):
