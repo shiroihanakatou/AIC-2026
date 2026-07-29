@@ -4,6 +4,36 @@ Sản phẩm vòng sơ tuyển AI Challenge 2026.
 
 Project này chạy trên Python 3.11.
 
+## Tiến độ dự án
+
+> Cập nhật lần cuối: 29-07-2026
+
+### Tổng quan trạng thái
+
+Dự án hiện đang ở giai đoạn xây dựng nền tảng dữ liệu và kho lưu trữ vector cho hệ thống truy xuất keyframe/video. Các thành phần cốt lõi đã có thể chạy được và tạo ra dữ liệu đã xử lý ở thư mục `data/processed/`.
+
+### Bảng theo dõi
+
+| Hạng mục | Trạng thái | Ghi chú |
+| --- | --- | --- |
+| Khởi tạo cấu trúc dự án | ✅ Hoàn thành | README, cấu trúc thư mục và môi trường Python đã được chuẩn bị. |
+| Loader dữ liệu từ `data/` | ✅ Hoàn thành | Hỗ trợ đọc song song keyframes, metadata, objects và CLIP features. |
+| Xây dựng pipeline tiền xử lý | ✅ Hoàn thành | Dữ liệu được ghép thành bản ghi phẳng để phục vụ lưu trữ và truy vấn. |
+| Tạo FAISS Vector Database | ✅ Hoàn thành | Đã có file index và map ID ở `data/processed/`. |
+| Tạo SQLite Metadata Database | ✅ Hoàn thành | Đã có file `metadata.db` chứa thông tin keyframe và object. |
+| Kiểm tra pipeline sau khi đóng gói | ✅ Hoàn thành | Có script kiểm tra dữ liệu đã đóng gói và tương tác với cả FAISS lẫn SQLite. |
+| Retrieval engine / semantic search | ⏳ Đang chờ phát triển | Chưa có module truy vấn nâng cao cho hệ thống tìm kiếm thực tế. |
+| API services | ⏳ Đang chờ phát triển | Chưa có endpoint phục vụ cho frontend hoặc hệ thống truy vấn. |
+| UX/UI | ⏳ Đang chờ phát triển | Chưa có giao diện người dùng. |
+| Agent / LLM workflow | ⏳ Đang chờ phát triển | Các module `sources/agent/` vẫn chưa được triển khai. |
+
+### Mốc phát triển tiếp theo
+
+1. Hoàn thiện module retrieval để thực hiện tìm kiếm vector/query trên dữ liệu đã đóng gói.
+2. Xây dựng API services để expose kết quả truy vấn cho UI.
+3. Thiết kế giao diện người dùng cho trải nghiệm tìm kiếm và xem kết quả.
+4. Mở rộng sang agent/LLM để hỗ trợ truy vấn tự nhiên và phân tích ngữ cảnh.
+
 ## Cấu trúc thư mục
 
 ### Nhóm `sources/`
