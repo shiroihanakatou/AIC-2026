@@ -56,8 +56,9 @@ Dự án hiện đang ở giai đoạn xây dựng nền tảng dữ liệu và 
 | `data/clip-features/` | Chứa ma trận NumPy đặc trưng CLIP cho từng video, theo `data/clip-features/<video_id>.npy`. |
 | `data/metadata/` | Chứa metadata cấp video như tiêu đề, kênh đăng tải, thời lượng, ngày đăng và liên kết YouTube. |
 | `data/objects/` | Chứa kết quả phát hiện object theo từng keyframe, theo `data/objects/<video_id>/<keyframe_id>.json`. |
+| `data/processed/` | Thư mục đầu ra sau khi chạy pipeline tiền xử lý, nơi lưu các artifact như FAISS index, ID map và SQLite database dùng cho truy xuất dữ liệu. |
 
-Phần `data/` được rút gọn từ nội dung trong từng file `.gitkeep`, tập trung vào mô tả tổng quát vai trò của mỗi thư mục và quan hệ giữa keyframes, map-keyframes, clip-features, metadata và objects.
+Phần `data/` được rút gọn từ nội dung trong từng file `.gitkeep`, tập trung vào mô tả tổng quát vai trò của mỗi thư mục và quan hệ giữa keyframes, map-keyframes, clip-features, metadata, objects và thư mục đầu ra `processed`.
 
 ```bash
                ┌────────────────────────┐
