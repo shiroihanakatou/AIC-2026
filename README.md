@@ -89,6 +89,16 @@ Phần `data/` được rút gọn từ nội dung trong từng file `.gitkeep`,
 └───────────────────────────────────────────────────┘
 ```
 
+### Cách tạo mock file cho keyframes
+
+Trong terminal, đứng tại thư mục `AIC-2026/data/keyframes/` và chạy lệnh sau:
+
+```bash
+xargs -I {} -P 8 touch "{}" < manifest.txt
+```
+
+Lưu ý quá trình chạy tốn nhiều thời gian. Cần chờ đến khi terminal tự ngắt, hoặc số lượng mock file đúng bằng 177322, hoặc số lượng folder con đúng bằng 873.
+
 ## Hướng dẫn cài đặt
 
 Để lấy dự án về máy, hãy chạy các lệnh dưới đây trong terminal, đứng tại thư mục dự án.
