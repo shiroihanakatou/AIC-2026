@@ -4,50 +4,16 @@ Sản phẩm vòng sơ tuyển AI Challenge 2026.
 
 Project này chạy trên Python 3.11.
 
-## Tiến độ dự án
+## Tiến độ hiện tại
 
-> Cập nhật lần cuối: 29-07-2026
-
-### Tổng quan trạng thái
-
-Dự án hiện đang ở giai đoạn xây dựng nền tảng dữ liệu và kho lưu trữ vector cho hệ thống truy xuất keyframe/video. Các thành phần cốt lõi đã có thể chạy được và tạo ra dữ liệu đã xử lý ở thư mục `data/processed/`.
-
-### Bảng theo dõi
-
-| Hạng mục | Trạng thái | Ghi chú |
-| --- | --- | --- |
-| Khởi tạo cấu trúc dự án | ✅ Hoàn thành | README, cấu trúc thư mục và môi trường Python đã được chuẩn bị. |
-| Loader dữ liệu từ `data/` | ✅ Hoàn thành | Hỗ trợ đọc song song keyframes, metadata, objects và CLIP features. |
-| Xây dựng pipeline tiền xử lý | ✅ Hoàn thành | Dữ liệu được ghép thành bản ghi phẳng để phục vụ lưu trữ và truy vấn. |
-| Tạo FAISS Vector Database | ✅ Hoàn thành | Đã có file index và map ID ở `data/processed/`. |
-| Tạo SQLite Metadata Database | ✅ Hoàn thành | Đã có file `metadata.db` chứa thông tin keyframe và object. |
-| Kiểm tra pipeline sau khi đóng gói | ✅ Hoàn thành | Có script kiểm tra dữ liệu đã đóng gói và tương tác với cả FAISS lẫn SQLite. |
-| Retrieval engine / semantic search | ⏳ Đang chờ phát triển | Chưa có module truy vấn nâng cao cho hệ thống tìm kiếm thực tế. |
-| API services | ⏳ Đang chờ phát triển | Chưa có endpoint phục vụ cho frontend hoặc hệ thống truy vấn. |
-| UX/UI | ⏳ Đang chờ phát triển | Chưa có giao diện người dùng. |
-| Agent / LLM workflow | ⏳ Đang chờ phát triển | Các module `sources/agent/` vẫn chưa được triển khai. |
-
-### Mốc phát triển tiếp theo
-
-1. Hoàn thiện module retrieval để thực hiện tìm kiếm vector/query trên dữ liệu đã đóng gói.
-2. Xây dựng API services để expose kết quả truy vấn cho UI.
-3. Thiết kế giao diện người dùng cho trải nghiệm tìm kiếm và xem kết quả.
-4. Mở rộng sang agent/LLM để hỗ trợ truy vấn tự nhiên và phân tích ngữ cảnh.
+- Đã hoàn thiện khung pipeline tiền xử lý dữ liệu: quét keyframes, lập chỉ mục frame vào SQLite, nối ma trận CLIP và trích xuất object/vocab vào `data/processed/`.
+- Đã hoàn thiện khung truy xuất: `QueryProcessor` mã hóa truy vấn bằng OpenCLIP và trích xuất `E_q`, còn `SearchEngine` kết hợp điểm CLIP với điểm object theo chiến lược top-candidate hai bước.
+- `debug.py` đã có thể dùng làm script kiểm tra truy vấn tương tác; với prompt thử `a man wearing a hat and shirt standing next to cattle inside a building`, hệ thống đã được đưa vào trạng thái chạy thử để rà luồng truy xuất end-to-end.
+- Phần cần tiếp tục theo dõi là mức độ đầy đủ của dữ liệu sinh ra trong `data/processed/` và độ ổn định khi chạy nhiều truy vấn liên tiếp trong chế độ tương tác.
 
 ## Cấu trúc thư mục
 
-### Nhóm `sources/`
-
-| Thư mục | Mô tả |
-| --- | --- |
-| `sources/agent/` | Sub-system dành cho Trợ lý AI (LLM Planner, Query Expansion, Conversational Agent phục vụ KISC/VideoQA). |
-| `sources/database/` | Quản lý kết nối, lưu trữ và truy vấn Vector Database cũng như Metadata Database. |
-| `sources/ingestion/` | Chứa các script đọc, làm sạch và chuẩn hóa dữ liệu từ `data/` (keyframes, clipfeatures, metadata, objects). |
-| `sources/retrieval/` | Lõi thuật toán tìm kiếm (Search engine, Cosine similarity, Fusion logic, Re-ranking). |
-| `sources/services/` | Dựng các endpoint API phục vụ dữ liệu cho UI. |
-| `sources/uxui/` | Mã nguồn giao diện người dùng (Streamlit / Gradio / React). |
-
-### Nhóm `data/`
+### `data/`
 
 | Thư mục | Mô tả |
 | --- | --- |
@@ -56,9 +22,7 @@ Dự án hiện đang ở giai đoạn xây dựng nền tảng dữ liệu và 
 | `data/clip-features/` | Chứa ma trận NumPy đặc trưng CLIP cho từng video, theo `data/clip-features/<video_id>.npy`. |
 | `data/metadata/` | Chứa metadata cấp video như tiêu đề, kênh đăng tải, thời lượng, ngày đăng và liên kết YouTube. |
 | `data/objects/` | Chứa kết quả phát hiện object theo từng keyframe, theo `data/objects/<video_id>/<keyframe_id>.json`. |
-| `data/processed/` | Thư mục đầu ra sau khi chạy pipeline tiền xử lý, nơi lưu các artifact như FAISS index, ID map và SQLite database dùng cho truy xuất dữ liệu. |
-
-Phần `data/` được rút gọn từ nội dung trong từng file `.gitkeep`, tập trung vào mô tả tổng quát vai trò của mỗi thư mục và quan hệ giữa keyframes, map-keyframes, clip-features, metadata, objects và thư mục đầu ra `processed`.
+| `data/processed/` | Thư mục đầu ra sau khi chạy pipeline tiền xử lý, nơi lưu các artifact dùng cho truy xuất dữ liệu. |
 
 ```bash
                ┌────────────────────────┐

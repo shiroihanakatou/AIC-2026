@@ -1,8 +1,9 @@
 Thư mục này dùng để lưu trữ các sản phẩm đã được đóng gói sau quá trình xử lý dữ liệu cho dự án AIC-2026.
 
 Các file có trong thư mục này gồm:
-- clip_faiss.index: file index vector dùng cho FAISS, lưu trữ các embedding/vector của các khung hình/video để hỗ trợ tìm kiếm tương đồng nhanh.
-- faiss_id_map.json: bản đồ ánh xạ giữa các ID trong FAISS và các ID toàn cục tương ứng, giúp nối kết kết quả tìm kiếm với bản ghi dữ liệu gốc.
-- metadata.db: cơ sở dữ liệu SQLite lưu trữ metadata liên quan đến từng item, như tiêu đề video, đường dẫn ảnh, lớp đối tượng được phát hiện, v.v.
+- clip_master.npy: tổng hợp tất cả các vector đặc trưng trong `data/clip_features/Lxx_Vxxx.npy`.
+- objects_master.json: tổng hợp và lọc thông tin của tất cả object trong `data/objects/Lxx_Vxx/xxx.json`.
+- openimages_v4_vocab.json: toàn bộ tự vựng của OpenImages V4 (lưu thông tin `detection_class_entities` và `detection_class_labels`).
+- frames_info.db: cơ sở dữ liệu SQLite, hợp nhất giữa các file `data/map-keyframes/Lxx_Vxxx.csv` và `data/metadata/Lxx_Vxxx.json`.
 
 Mục đích của thư mục processed là gom tất cả dữ liệu đã được tiền xử lý và chuẩn bị sẵn cho việc truy vấn, tìm kiếm và phục vụ hệ thống retrieval.
